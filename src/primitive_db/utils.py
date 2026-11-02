@@ -17,3 +17,13 @@ def load_metadata(filepath: str) -> dict:
         db_dict = {}
     return db_dict
 
+
+def save_metadata(filepath: str, data: dict) -> None:
+    """Загрузка данных в файл
+
+    Args:
+        filepath (str): путь к файлу
+        data (dict): database
+    """
+    with open(filepath, 'w') as f:
+        json.dump(data, f)
