@@ -42,3 +42,26 @@ def create_table(
     metadata[table_name] = table_columns
 
     return metadata
+
+
+def drop_table(
+        metadata: dict[str, dict[str, str]], 
+        table_name: str
+    ) -> dict[str, dict[str, str]]:
+    """Удаление таблицы по её имени
+
+    Args:
+        metadata (dict[str, dict[str, str]]): метаданные таблицы
+        table_name (str): название таблицы
+
+    Raises:
+        ValueError: _description_
+
+    Returns:
+        dict[str, dict[str, str]]: обновленные метаданные
+    """
+    if table_name not in metadata:
+        raise ValueError(f'No table with name: {table_name}')
+
+    del metadata[table_name]
+    return metadata
