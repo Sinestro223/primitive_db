@@ -10,11 +10,6 @@ def create_table(
         table_name (str): название таблицы
         columns (dict[str, str]): названия колонок с типами
 
-    Raises:
-        ValueError: _description_
-        TypeError: _description_
-        TypeError: _description_
-
     Returns:
         dict[str, dict[str, str]]: обновленные метаданные
     """
@@ -53,9 +48,6 @@ def drop_table(
     Args:
         metadata (dict[str, dict[str, str]]): метаданные таблицы
         table_name (str): название таблицы
-
-    Raises:
-        ValueError: _description_
 
     Returns:
         dict[str, dict[str, str]]: обновленные метаданные

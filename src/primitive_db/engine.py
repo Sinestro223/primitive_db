@@ -8,7 +8,7 @@ from .utils import load_metadata, save_metadata
 
 
 def print_help() -> None:
-    """Prints the help message for the current mode."""
+    """Печатает текст help"""
    
     print("\n***Процесс работы с таблицей***")
     print("Функции:")
@@ -22,6 +22,7 @@ def print_help() -> None:
 
 
 def run() -> None:
+    """Запускает цикл для работы с database"""
     print_help()
     while True:
         db_meta = load_metadata(META_FILE)
