@@ -138,3 +138,34 @@ def insert(
     record.update(column_values)
     table_data.append(record)
     return table_data
+
+
+def update(
+        table_data: list[dict[str, Any]],
+        set_clause: dict[str, Any],
+        where_clause: dict[str, Any]
+    ) -> list[dict[str, Any]]:
+    """Обновление записей по условию
+
+    Args:
+        table_data (list[dict[str, Any]]): записи таблицы
+        set_clause (dict[str, Any]): столбцы и их новые значения
+        where_clause (dict[str, Any]): название столбца и его значение
+
+    Returns:
+        list[dict[str, Any]]: обновленные данные таблицы
+    """
+    if len(where_clause) != 1:
+        raise ValueError('Укажите одно условие для обновления')
+    if 'ID' in set_clause:
+        raise ValueError('Нельзя изменять ID записи')
+
+    clause_col_name, clause_val = next(iter(where_clause.items()))
+    updated_data = []
+    for row in table_data:
+        if row[clause_col_name] == clause_val:
+            row = row.copy()
+            row.update(set_clause)
+        updated_data.append(row)
+
+    return updated_data
