@@ -74,3 +74,26 @@ def select(
     return [
         row for row in table_data if row[clause_col_name] == clause_val
     ]
+
+
+def delete(
+        table_data: list[dict[str, Any]],
+        where_clause: dict[str, Any]
+    ) -> list[dict[str, Any]]:
+    """Удаление записей по условию
+
+    Args:
+        table_data (list[dict[str, Any]]): записи таблицы
+        where_clause (dict[str, Any]): название столбца и его значение
+
+    Returns:
+        list[dict[str, Any]]: записи, которые остались в таблице
+    """
+    if len(where_clause) != 1:
+        raise ValueError('Укажите одно условие для удаления')
+
+    clause_col_name = list(where_clause.keys())[0]
+    clause_val = list(where_clause.values())[0]
+    return [
+        row for row in table_data if row[clause_col_name] != clause_val
+    ]
