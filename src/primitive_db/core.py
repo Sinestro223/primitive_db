@@ -1,3 +1,6 @@
+from typing import Any
+
+
 def create_table(
         metadata: dict[str, dict[str, str]], 
         table_name: str, 
@@ -57,3 +60,17 @@ def drop_table(
 
     del metadata[table_name]
     return metadata
+
+
+def select(
+        table_data: list[dict[str, Any]], 
+        where_clause=None
+    ):
+    if where_clause is None:
+        return table_data
+
+    clause_col_name = list(where_clause.keys())[0]
+    clause_val = list(where_clause.values())[0]
+    return [
+        row for row in table_data if row[clause_col_name] == clause_val
+    ]
