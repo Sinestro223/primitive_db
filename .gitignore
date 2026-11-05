@@ -14,3 +14,7 @@ tests/
 .pytest_cache/
 
 .ruff_cache/
+
+data/
+
+db_meta.json
