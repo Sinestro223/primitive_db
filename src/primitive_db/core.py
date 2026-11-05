@@ -1,5 +1,8 @@
 from typing import Any
 
+from .constants import DATATYPE_DICT
+from .utils import load_table_data
+
 
 def create_table(
         metadata: dict[str, dict[str, str]], 
@@ -97,3 +100,41 @@ def delete(
     return [
         row for row in table_data if row[clause_col_name] != clause_val
     ]
+
+
+def insert(
+        metadata: dict[str, dict[str, str]],
+        table_name: str,
+        values: list[Any]
+    ) -> list[dict[str, Any]]:
+    """Добавление записи в данные таблицы
+
+    Args:
+        metadata (dict[str, dict[str, str]]): метаданные таблиц
+        table_name (str): название таблицы
+        values (list[Any]): значения столбцов в порядке схемы без ID
+
+    Returns:
+        list[dict[str, Any]]: обновленные данные таблицы
+    """
+    if table_name not in metadata:
+        raise ValueError(f'No table with name: {table_name}')
+
+    table_columns = {
+        name: dtype for name, dtype in metadata[table_name].items() if name != 'ID'
+    }
+    if len(values) != len(table_columns):
+        raise ValueError(f'Ожидалось значений без ID: {len(table_columns)}')
+
+    column_values = {}
+    for (name, dtype), value in zip(table_columns.items(), values, strict=True):
+        if type(value) is not DATATYPE_DICT.get(dtype):
+            raise ValueError(f'Столбец "{name}" должен иметь тип {dtype}')
+        column_values[name] = value
+
+    table_data = load_table_data(table_name)
+    new_id = max((row['ID'] for row in table_data), default=0) + 1
+    record = {'ID': new_id}
+    record.update(column_values)
+    table_data.append(record)
+    return table_data
