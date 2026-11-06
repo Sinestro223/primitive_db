@@ -100,6 +100,7 @@ def run() -> None:
                     table_name = splitted_command[1]
                     db_meta = drop_table(db_meta, table_name)
                     if db_meta is None:
+                        print(f'Таблица {table_name} не будет удалена')
                         continue
                     save_metadata(META_FILE, db_meta)
                     print(f'Таблица {table_name} удалена')
@@ -228,6 +229,7 @@ def run() -> None:
                         continue
                     updated_data = delete(table_data, where_clause)
                     if updated_data is None:
+                        print(f'Данные из таблицы {table_name} не будут удалены')
                         continue
                     save_table_data(table_name, updated_data)
                     for row in selected_data:

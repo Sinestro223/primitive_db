@@ -1,4 +1,7 @@
+from functools import wraps
 from typing import Callable
+
+import prompt
 
 
 def handle_db_errors(func: Callable) -> Callable:
@@ -22,3 +25,19 @@ def handle_db_errors(func: Callable) -> Callable:
         return None
 
     return wrapper
+
+
+def confirm_action(command_name):
+    def _decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            res = prompt.string(
+                'Вы уверены, что хотите выполнить '
+                f'"{command_name}"? [y/n]: ',
+                empty=True
+            )
+            if res == 'y':
+                return func(*args, **kwargs)
+            return None
+        return wrapper
+    return _decorator

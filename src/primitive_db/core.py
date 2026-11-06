@@ -1,7 +1,7 @@
 from typing import Any
 
 from .constants import DATATYPE_DICT
-from .decorators import handle_db_errors
+from .decorators import handle_db_errors, confirm_action
 from .utils import load_table_data
 
 
@@ -48,6 +48,7 @@ def create_table(
 
 
 @handle_db_errors
+@confirm_action('удаление таблицы')
 def drop_table(
         metadata: dict[str, dict[str, str]], 
         table_name: str
@@ -84,6 +85,7 @@ def select(
 
 
 @handle_db_errors
+@confirm_action('удаление записей')
 def delete(
         table_data: list[dict[str, Any]],
         where_clause: dict[str, Any]
