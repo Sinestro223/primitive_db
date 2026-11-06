@@ -63,3 +63,19 @@ def log_time(func: Callable) -> Callable:
             print(f'Функция {func.__name__} выполнилась за {elapsed:.3f} секунд')
 
     return wrapper
+
+
+def create_cacher() -> Callable:
+    """Декоратор для кеширования результатов функции
+
+    Returns:
+        Callable: функция для вычисления результата
+    """
+    cache = {}
+    def cache_result(key, value_func: Callable):
+        if key in cache:
+            print('Берем из кеша')
+            return cache[key]
+        cache[key] = value_func()
+        return cache[key]
+    return cache_result

@@ -1,8 +1,16 @@
-from typing import Any
+from typing import Any, Callable
 
 from .constants import DATATYPE_DICT
-from .decorators import confirm_action, handle_db_errors, log_time
+from .decorators import confirm_action, create_cacher, handle_db_errors, log_time
 from .utils import load_table_data
+
+cache_select = create_cacher()
+
+
+def set_select_cache(cache_result: Callable) -> None:
+    """Заменяет кеш выборки."""
+    global cache_select
+    cache_select = cache_result
 
 
 @handle_db_errors
@@ -72,17 +80,38 @@ def drop_table(
 @handle_db_errors
 @log_time
 def select(
-        table_data: list[dict[str, Any]], 
-        where_clause=None
-    ):
-    if where_clause is None:
-        return table_data
+        table_data: list[dict[str, Any]],
+        where_clause: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
+    """Выбор записей по возможному условию
 
-    clause_col_name = list(where_clause.keys())[0]
-    clause_val = list(where_clause.values())[0]
-    return [
-        row for row in table_data if row[clause_col_name] == clause_val
-    ]
+    Args:
+        table_data (list[dict[str, Any]]): записи таблицы
+        where_clause (dict[str, Any] | None, optional): условие. Defaults to None.
+
+    Returns:
+        list[dict[str, Any]]: выбранные записи
+    """
+    if where_clause is None:
+        row_count = len(table_data)
+
+        def find_all_indices():
+            return range(row_count)
+
+        matching_indices = cache_select((None, row_count), find_all_indices)
+        return [table_data[index] for index in matching_indices]
+
+    clause_col_name, clause_val = next(iter(where_clause.items()))
+    column_values = tuple(row[clause_col_name] for row in table_data)
+    cache_key = (clause_col_name, clause_val, column_values)
+
+    def find_matching_indices():
+        return tuple(
+            index for index, value in enumerate(column_values) if value == clause_val
+        )
+
+    matching_indices = cache_select(cache_key, find_matching_indices)
+    return [table_data[index] for index in matching_indices]
 
 
 @handle_db_errors

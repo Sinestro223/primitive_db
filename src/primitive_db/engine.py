@@ -4,7 +4,16 @@ import prompt
 from prettytable import PrettyTable
 
 from .constants import DATATYPE_DICT, META_FILE
-from .core import create_table, delete, drop_table, insert, select, update
+from .core import (
+    create_table,
+    delete,
+    drop_table,
+    insert,
+    select,
+    set_select_cache,
+    update,
+)
+from .decorators import create_cacher
 from .parsers import parse_set, parse_values, parse_where
 from .utils import load_metadata, load_table_data, save_metadata, save_table_data
 
@@ -31,6 +40,7 @@ def print_help() -> None:
 def run() -> None:
     """Запускает цикл для работы с database"""
     print_help()
+    set_select_cache(create_cacher())
     while True:
         db_meta = load_metadata(META_FILE)
         command = prompt.string('>>>Введите команду: ')
@@ -103,6 +113,7 @@ def run() -> None:
                         print(f'Таблица {table_name} не будет удалена')
                         continue
                     save_metadata(META_FILE, db_meta)
+                    set_select_cache(create_cacher())
                     print(f'Таблица {table_name} удалена')
                 case 'list_tables':
                     if len(splitted_command) != 1:
@@ -127,6 +138,7 @@ def run() -> None:
                     if table_data is None:
                         continue
                     save_table_data(table_name, table_data)
+                    set_select_cache(create_cacher())
                     record_id = table_data[-1]['ID']
                     print(
                         f'Запись с ID={record_id} добавлена '
@@ -196,6 +208,7 @@ def run() -> None:
                         print('Подходящих записей нет')
                         continue
                     save_table_data(table_name, updated_data)
+                    set_select_cache(create_cacher())
                     for row in selected_data:
                         print(
                             f'Запись с ID={row["ID"]} в таблице "{table_name}" '
@@ -232,6 +245,7 @@ def run() -> None:
                         print(f'Данные из таблицы {table_name} не будут удалены')
                         continue
                     save_table_data(table_name, updated_data)
+                    set_select_cache(create_cacher())
                     for row in selected_data:
                         print(
                             f'Запись с ID={row["ID"]} удалена '
