@@ -1,7 +1,7 @@
 from typing import Any
 
 from .constants import DATATYPE_DICT
-from .decorators import handle_db_errors, confirm_action
+from .decorators import confirm_action, handle_db_errors, log_time
 from .utils import load_table_data
 
 
@@ -70,6 +70,7 @@ def drop_table(
 
 
 @handle_db_errors
+@log_time
 def select(
         table_data: list[dict[str, Any]], 
         where_clause=None
@@ -110,6 +111,7 @@ def delete(
 
 
 @handle_db_errors
+@log_time
 def insert(
         metadata: dict[str, dict[str, str]],
         table_name: str,
