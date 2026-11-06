@@ -1,9 +1,11 @@
 from typing import Any
 
 from .constants import DATATYPE_DICT
+from .decorators import handle_db_errors
 from .utils import load_table_data
 
 
+@handle_db_errors
 def create_table(
         metadata: dict[str, dict[str, str]], 
         table_name: str, 
@@ -45,6 +47,7 @@ def create_table(
     return metadata
 
 
+@handle_db_errors
 def drop_table(
         metadata: dict[str, dict[str, str]], 
         table_name: str
@@ -65,6 +68,7 @@ def drop_table(
     return metadata
 
 
+@handle_db_errors
 def select(
         table_data: list[dict[str, Any]], 
         where_clause=None
@@ -79,6 +83,7 @@ def select(
     ]
 
 
+@handle_db_errors
 def delete(
         table_data: list[dict[str, Any]],
         where_clause: dict[str, Any]
@@ -102,6 +107,7 @@ def delete(
     ]
 
 
+@handle_db_errors
 def insert(
         metadata: dict[str, dict[str, str]],
         table_name: str,
@@ -140,6 +146,7 @@ def insert(
     return table_data
 
 
+@handle_db_errors
 def update(
         table_data: list[dict[str, Any]],
         set_clause: dict[str, Any],

@@ -83,6 +83,8 @@ def run() -> None:
                         col_dtype_dict[col_name] = dtype
 
                     db_meta = create_table(db_meta, table_name, col_dtype_dict)
+                    if db_meta is None:
+                        continue
                     save_metadata(META_FILE, db_meta)
                     table_columns = ', '.join(
                         f'{name}:{dtype}'
@@ -97,6 +99,8 @@ def run() -> None:
                         raise ValueError('Введите одно имя таблицы в drop_table')
                     table_name = splitted_command[1]
                     db_meta = drop_table(db_meta, table_name)
+                    if db_meta is None:
+                        continue
                     save_metadata(META_FILE, db_meta)
                     print(f'Таблица {table_name} удалена')
                 case 'list_tables':
@@ -119,6 +123,8 @@ def run() -> None:
                         raise ValueError(f'Таблица "{table_name}" не существует')
                     values = parse_values(' '.join(splitted_command[4:]))
                     table_data = insert(db_meta, table_name, values)
+                    if table_data is None:
+                        continue
                     save_table_data(table_name, table_data)
                     record_id = table_data[-1]['ID']
                     print(
@@ -148,6 +154,8 @@ def run() -> None:
 
                     table_data = load_table_data(table_name)
                     selected_data = select(table_data, where_clause)
+                    if selected_data is None:
+                        continue
                     table = PrettyTable(list(table_columns))
                     for row in selected_data:
                         table.add_row([row[col_name] for col_name in table_columns])
@@ -178,7 +186,11 @@ def run() -> None:
 
                     table_data = load_table_data(table_name)
                     selected_data = select(table_data, where_clause)
+                    if selected_data is None:
+                        continue
                     updated_data = update(table_data, set_clause, where_clause)
+                    if updated_data is None:
+                        continue
                     if not selected_data:
                         print('Подходящих записей нет')
                         continue
@@ -209,10 +221,14 @@ def run() -> None:
                             )
                     table_data = load_table_data(table_name)
                     selected_data = select(table_data, where_clause)
+                    if selected_data is None:
+                        continue
                     if not selected_data:
                         print('Подходящих записей нет')
                         continue
                     updated_data = delete(table_data, where_clause)
+                    if updated_data is None:
+                        continue
                     save_table_data(table_name, updated_data)
                     for row in selected_data:
                         print(
