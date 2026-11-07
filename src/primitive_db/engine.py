@@ -47,7 +47,7 @@ def run() -> None:
     set_select_cache(create_cacher())
     while True:
         db_meta = load_metadata(META_FILE)
-        command = prompt.string('>>>Введите команду: ')
+        command = prompt.string('>>> Введите команду: ')
         command = command.strip()
         try:
             command_name = command.split(maxsplit=1)
@@ -102,7 +102,7 @@ def run() -> None:
                         for name, dtype in db_meta[table_name].items()
                     )
                     print(
-                        f'Таблица "{table_name}" создана '
+                        f'Таблица "{table_name}" успешно создана '
                         f'со столбцами: {table_columns}'
                     )
                 case 'drop_table':
@@ -120,7 +120,7 @@ def run() -> None:
                         continue
                     save_metadata(META_FILE, db_meta)
                     set_select_cache(create_cacher())
-                    print(f'Таблица {table_name} удалена')
+                    print(f'Таблица "{table_name}" успешно удалена.')
                 case 'list_tables':
                     if len(splitted_command) != 1:
                         raise ValueError('list_tables не принимает аргументы')
@@ -221,7 +221,7 @@ def run() -> None:
                     for record_id in updated_ids:
                         print(
                             f'Запись с ID={record_id} в таблице "{table_name}" '
-                            'обновлена'
+                            'успешно обновлена.'
                         )
                 case 'delete':
                     if len(splitted_command) < 5 or (
@@ -281,6 +281,6 @@ def run() -> None:
                         'Попробуйте снова'
                     )
                     continue
-        except ValueError as e:
-            print(f'Ошибка: {e}')
+        except ValueError as error:
+            print(f'Ошибка: {error}')
     print('Выход из программы')

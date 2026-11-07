@@ -45,11 +45,11 @@ def load_metadata(filepath: str) -> dict:
 
 
 def save_metadata(filepath: str, data: dict) -> None:
-    """Загрузка данных в файл
+    """Сохранение метаданных в JSON-файл
 
     Args:
         filepath (str): путь к файлу
-        data (dict): database
+        data (dict): метаданные таблиц
     """
     with open(filepath, 'w') as f:
         json.dump(data, f)

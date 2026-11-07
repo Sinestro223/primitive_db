@@ -12,8 +12,9 @@ def handle_db_errors(func: Callable) -> Callable:
         func (Callable): функция, где перехватываются ошибки
 
     Returns:
-        Callable: обертка для функции
+        Callable: обертка, которая возвращает None при обработанной ошибке
     """
+    @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -28,7 +29,15 @@ def handle_db_errors(func: Callable) -> Callable:
     return wrapper
 
 
-def confirm_action(command_name):
+def confirm_action(command_name: str) -> Callable:
+    """Создание декоратора, выполняющего команду после ответа y
+
+    Args:
+        command_name (str): описание команды
+
+    Returns:
+        Callable: декоратор для команды, которая требует подтверждения
+    """
     def _decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -66,10 +75,10 @@ def log_time(func: Callable) -> Callable:
 
 
 def create_cacher() -> Callable:
-    """Декоратор для кеширования результатов функции
+    """Создание функции с собственным кешем
 
     Returns:
-        Callable: функция для вычисления результата
+        Callable: функция, которая вычисляет результат при отсутствии ключа
     """
     cache = {}
     def cache_result(key, value_func: Callable):

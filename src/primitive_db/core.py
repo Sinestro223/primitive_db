@@ -35,7 +35,7 @@ def create_table(
     """
     validate_table_name(table_name)
     if table_name in metadata:
-        raise ValueError(f'Table with name: "{table_name}" already exists.')
+        raise ValueError(f'Таблица "{table_name}" уже существует.')
 
     unsupported_dtypes = {
         dtype for dtype in columns.values() if dtype not in DATATYPE_DICT
@@ -45,7 +45,7 @@ def create_table(
         raise ValueError(f'Недопустимые типы столбцов: {types}')
 
     if 'ID' in columns and columns['ID'] != 'int':
-        raise ValueError('ID must have type int')
+        raise ValueError('Столбец ID должен иметь тип int')
     
     table_columns = {"ID": "int"}
     table_columns.update(columns)
@@ -71,7 +71,7 @@ def drop_table(
         dict[str, dict[str, str]]: обновленные метаданные
     """
     if table_name not in metadata:
-        raise ValueError(f'No table with name: {table_name}')
+        raise ValueError(f'Таблица "{table_name}" не существует.')
 
     del metadata[table_name]
     return metadata
@@ -87,8 +87,7 @@ def select(
 
     Args:
         table_data (list[dict[str, Any]]): записи таблицы
-        where_clause (dict[str, Any] | None, optional): условие. 
-            Defaults to None.
+        where_clause (dict[str, Any] | None): условие выборки или None для всех записей
 
     Returns:
         list[dict[str, Any]]: выбранные записи
@@ -158,7 +157,7 @@ def insert(
         list[dict[str, Any]]: обновленные данные таблицы
     """
     if table_name not in metadata:
-        raise ValueError(f'No table with name: {table_name}')
+        raise ValueError(f'Таблица "{table_name}" не существует.')
 
     table_columns = {
         name: dtype for name, dtype in metadata[table_name].items() if name != 'ID'
