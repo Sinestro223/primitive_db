@@ -4,6 +4,29 @@ import os
 from .constants import DATA_DIR
 
 
+def validate_table_name(table_name: str) -> None:
+    """Проверка, что имя таблицы это не путь
+
+    Args:
+        table_name (str): потенциальное имя таблицы
+    """
+    if not table_name.isidentifier():
+        raise ValueError(f'Недопустимое имя таблицы: "{table_name}"')
+
+
+def _table_data_path(table_name: str) -> str:
+    """Создание пути с валидацией
+
+    Args:
+        table_name (str): имя таблицы
+
+    Returns:
+        str: путь к таблице
+    """
+    validate_table_name(table_name)
+    return os.path.join(DATA_DIR, f'{table_name}.json')
+
+
 def load_metadata(filepath: str) -> dict:
     """Загрузка данных из файла
 
@@ -38,10 +61,7 @@ def delete_table_data(table_name: str) -> None:
     Args:
         table_name (str): название таблицы
     """
-    if table_name != os.path.basename(table_name):
-        raise ValueError('Имя таблицы не может содержать путь')
-
-    filepath = os.path.join(DATA_DIR, f'{table_name}.json')
+    filepath = _table_data_path(table_name)
     try:
         os.remove(filepath)
     except FileNotFoundError:
@@ -57,7 +77,7 @@ def load_table_data(table_name: str) -> list[dict]:
     Returns:
         list[dict]: список записей таблицы
     """
-    filepath = os.path.join(DATA_DIR, f'{table_name}.json')
+    filepath = _table_data_path(table_name)
     try:
         with open(filepath, 'r') as f:
             table_data = json.load(f)
@@ -73,7 +93,7 @@ def save_table_data(table_name: str, data: list[dict]) -> None:
         table_name (str): название таблицы
         data (list[dict]): список записей таблицы
     """
+    filepath = _table_data_path(table_name)
     os.makedirs(DATA_DIR, exist_ok=True)
-    filepath = os.path.join(DATA_DIR, f'{table_name}.json')
     with open(filepath, 'w') as f:
         json.dump(data, f)

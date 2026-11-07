@@ -2,7 +2,7 @@ from typing import Any, Callable
 
 from .constants import DATATYPE_DICT
 from .decorators import confirm_action, create_cacher, handle_db_errors, log_time
-from .utils import load_table_data
+from .utils import load_table_data, validate_table_name
 
 cache_select = create_cacher()
 
@@ -29,6 +29,7 @@ def create_table(
     Returns:
         dict[str, dict[str, str]]: обновленные метаданные
     """
+    validate_table_name(table_name)
     if table_name in metadata:
         raise ValueError(f'Table with name: "{table_name}" already exists.')
 
