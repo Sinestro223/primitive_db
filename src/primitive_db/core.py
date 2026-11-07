@@ -37,17 +37,12 @@ def create_table(
     if table_name in metadata:
         raise ValueError(f'Table with name: "{table_name}" already exists.')
 
-    allowed_dtypes_check = all(
-        (dtype in {'int', 'str', 'bool'}) 
-        for dtype in columns.values()
-    )
-
-    if not allowed_dtypes_check:
-        unsupported_dtypes = {
-            dtype for dtype in columns.values() 
-            if dtype not in {'int', 'str', 'bool'}
-        }
-        raise ValueError('Unsupported types:', *unsupported_dtypes)
+    unsupported_dtypes = {
+        dtype for dtype in columns.values() if dtype not in DATATYPE_DICT
+    }
+    if unsupported_dtypes:
+        types = ', '.join(repr(dtype) for dtype in sorted(unsupported_dtypes))
+        raise ValueError(f'Недопустимые типы столбцов: {types}')
 
     if 'ID' in columns and columns['ID'] != 'int':
         raise ValueError('ID must have type int')
