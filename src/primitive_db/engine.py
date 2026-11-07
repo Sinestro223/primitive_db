@@ -1,5 +1,3 @@
-import shlex
-
 import prompt
 from prettytable import PrettyTable
 
@@ -14,7 +12,7 @@ from .core import (
     update,
 )
 from .decorators import create_cacher
-from .parser import parse_set, parse_values, parse_where
+from .parser import parse_set, parse_values, parse_where, split_tokens
 from .utils import (
     delete_table_data,
     load_metadata,
@@ -56,12 +54,9 @@ def run() -> None:
             if command_name and command_name[0] in {
                 'insert', 'select', 'update', 'delete', 'info'
             }:
-                lexer = shlex.shlex(command, posix=False, punctuation_chars='=,()')
-                lexer.whitespace_split = True
-                lexer.commenters = ''
-                splitted_command = list(lexer)
+                splitted_command = split_tokens(command, '=,()')
             else:
-                splitted_command = shlex.split(command)
+                splitted_command = split_tokens(command)
 
             if not splitted_command:
                 print('Введите команду, попробуйте снова')
@@ -141,7 +136,7 @@ def run() -> None:
                         or splitted_command[3] != 'values'
                     ):
                         raise ValueError('Ожидалось insert into <таблица> values (...)')
-                    table_name = shlex.split(splitted_command[2])[0]
+                    table_name = split_tokens(splitted_command[2])[0]
                     if table_name not in db_meta:
                         raise ValueError(f'Таблица "{table_name}" не существует')
                     values = parse_values(' '.join(splitted_command[4:]))
@@ -152,13 +147,13 @@ def run() -> None:
                     set_select_cache(create_cacher())
                     record_id = table_data[-1]['ID']
                     print(
-                        f'Запись с ID={record_id} добавлена '
-                        f'в таблицу "{table_name}"'
+                        f'Запись с ID={record_id} успешно добавлена '
+                        f'в таблицу "{table_name}".'
                     )
                 case 'select':
                     if len(splitted_command) < 3 or splitted_command[1] != 'from':
                         raise ValueError('Ожидалось select from таблица')
-                    table_name = shlex.split(splitted_command[2])[0]
+                    table_name = split_tokens(splitted_command[2])[0]
                     if table_name not in db_meta:
                         raise ValueError(f'Таблица "{table_name}" не существует')
                     table_columns = db_meta[table_name]
@@ -187,7 +182,7 @@ def run() -> None:
                 case 'update':
                     if len(splitted_command) < 4 or splitted_command[2] != 'set':
                         raise ValueError('Ожидалось update таблица set ... where ...')
-                    table_name = shlex.split(splitted_command[1])[0]
+                    table_name = split_tokens(splitted_command[1])[0]
                     if table_name not in db_meta:
                         raise ValueError(f'Таблица "{table_name}" не существует')
                     table_columns = db_meta[table_name]
@@ -234,7 +229,7 @@ def run() -> None:
                         or splitted_command[3] != 'where'
                     ):
                         raise ValueError('Ожидалось delete from таблица where условие')
-                    table_name = shlex.split(splitted_command[2])[0]
+                    table_name = split_tokens(splitted_command[2])[0]
                     if table_name not in db_meta:
                         raise ValueError(f'Таблица "{table_name}" не существует')
                     table_columns = db_meta[table_name]
@@ -264,13 +259,13 @@ def run() -> None:
                     set_select_cache(create_cacher())
                     for record_id in deleted_ids:
                         print(
-                            f'Запись с ID={record_id} удалена '
-                            f'из таблицы "{table_name}"'
+                            f'Запись с ID={record_id} успешно удалена '
+                            f'из таблицы "{table_name}".'
                         )
                 case 'info':
                     if len(splitted_command) != 2:
                         raise ValueError('Введите одно имя таблицы в info')
-                    table_name = shlex.split(splitted_command[1])[0]
+                    table_name = split_tokens(splitted_command[1])[0]
                     if table_name not in db_meta:
                         raise ValueError(f'Таблица "{table_name}" не существует')
                     table_columns = db_meta[table_name]

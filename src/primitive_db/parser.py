@@ -1,23 +1,31 @@
 import shlex
 
 
-def _split_tokens(
-        text: str, 
-        punctuation: str
-    ) -> list[str]:
-    """Разделение строки с сохранением кавычек у значений
+def split_tokens(text: str, punctuation: str | None = None) -> list[str]:
+    """Разбивает строку на токены
 
     Args:
         text (str): строка для разбора
-        punctuation (str): символы, которые выделяются в отдельные токены
+        punctuation (str | None): символы для выделения в отдельные токены
+            Если указаны, кавычки сохраняются
 
     Returns:
-        list[str]: токены с сохраненными кавычками
+        list[str]: токены строки
     """
-    lexer = shlex.shlex(text, posix=False, punctuation_chars=punctuation)
-    lexer.whitespace_split = True
-    lexer.commenters = ''
-    return list(lexer)
+    try:
+        if punctuation is None:
+            return shlex.split(text)
+
+        lexer = shlex.shlex(text, posix=False, punctuation_chars=punctuation)
+        lexer.whitespace_split = True
+        lexer.commenters = ''
+        return list(lexer)
+    except ValueError as error:
+        if str(error) == 'No closing quotation':
+            raise ValueError('Не закрыты кавычки')
+        if str(error) == 'No escaped character':
+            raise ValueError('После обратной косой черты ожидается символ')
+        raise
 
 
 def _parse_value(
@@ -52,7 +60,7 @@ def _parse_assignment(
     Returns:
         dict[str, str | int | bool]: название столбца и его значение
     """
-    tokens = _split_tokens(clause, '=')
+    tokens = split_tokens(clause, '=')
     if len(tokens) != 3 or tokens[1] != '=':
         raise ValueError('Ожидалось выражение в формате столбец = значение')
 
@@ -107,7 +115,7 @@ def parse_values(
     if not clause.startswith('(') or not clause.endswith(')'):
         raise ValueError('Значения должны быть в скобках')
 
-    tokens = _split_tokens(clause[1:-1], ',')
+    tokens = split_tokens(clause[1:-1], ',')
     if not tokens:
         return []
     if len(tokens) % 2 == 0 or any(token != ',' for token in tokens[1::2]):
