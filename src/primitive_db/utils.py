@@ -32,6 +32,22 @@ def save_metadata(filepath: str, data: dict) -> None:
         json.dump(data, f)
 
 
+def delete_table_data(table_name: str) -> None:
+    """Удаление таблицы по названию
+
+    Args:
+        table_name (str): название таблицы
+    """
+    if table_name != os.path.basename(table_name):
+        raise ValueError('Имя таблицы не может содержать путь')
+
+    filepath = os.path.join(DATA_DIR, f'{table_name}.json')
+    try:
+        os.remove(filepath)
+    except FileNotFoundError:
+        pass
+
+
 def load_table_data(table_name: str) -> list[dict]:
     """Загрузка данных таблицы из файла
 

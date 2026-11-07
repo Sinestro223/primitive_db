@@ -15,7 +15,13 @@ from .core import (
 )
 from .decorators import create_cacher
 from .parsers import parse_set, parse_values, parse_where
-from .utils import load_metadata, load_table_data, save_metadata, save_table_data
+from .utils import (
+    delete_table_data,
+    load_metadata,
+    load_table_data,
+    save_metadata,
+    save_table_data,
+)
 
 
 def print_help() -> None:
@@ -111,6 +117,11 @@ def run() -> None:
                     db_meta = drop_table(db_meta, table_name)
                     if db_meta is None:
                         print(f'Таблица {table_name} не будет удалена')
+                        continue
+                    try:
+                        delete_table_data(table_name)
+                    except OSError as error:
+                        print(f'Ошибка удаления файла таблицы: {error}')
                         continue
                     save_metadata(META_FILE, db_meta)
                     set_select_cache(create_cacher())
