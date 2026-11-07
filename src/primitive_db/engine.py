@@ -14,7 +14,7 @@ from .core import (
     update,
 )
 from .decorators import create_cacher
-from .parsers import parse_set, parse_values, parse_where
+from .parser import parse_set, parse_values, parse_where
 from .utils import (
     delete_table_data,
     load_metadata,
