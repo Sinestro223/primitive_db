@@ -198,20 +198,23 @@ def run() -> None:
                                 )
 
                     table_data = load_table_data(table_name)
-                    selected_data = select(table_data, where_clause)
-                    if selected_data is None:
-                        continue
                     updated_data = update(table_data, set_clause, where_clause)
                     if updated_data is None:
                         continue
-                    if not selected_data:
+                    row_pairs = zip(table_data, updated_data, strict=True)
+                    updated_ids = [
+                        updated['ID']
+                        for original, updated in row_pairs
+                        if updated is not original
+                    ]
+                    if not updated_ids:
                         print('Подходящих записей нет')
                         continue
                     save_table_data(table_name, updated_data)
                     set_select_cache(create_cacher())
-                    for row in selected_data:
+                    for record_id in updated_ids:
                         print(
-                            f'Запись с ID={row["ID"]} в таблице "{table_name}" '
+                            f'Запись с ID={record_id} в таблице "{table_name}" '
                             'обновлена'
                         )
                 case 'delete':
@@ -234,21 +237,23 @@ def run() -> None:
                                 f'Столбец "{col_name}" должен иметь тип {dtype}'
                             )
                     table_data = load_table_data(table_name)
-                    selected_data = select(table_data, where_clause)
-                    if selected_data is None:
-                        continue
-                    if not selected_data:
-                        print('Подходящих записей нет')
-                        continue
                     updated_data = delete(table_data, where_clause)
                     if updated_data is None:
                         print(f'Данные из таблицы {table_name} не будут удалены')
                         continue
+                    if len(updated_data) == len(table_data):
+                        print('Подходящих записей нет')
+                        continue
+                    remaining_ids = {row['ID'] for row in updated_data}
+                    deleted_ids = [
+                        row['ID'] for row in table_data
+                        if row['ID'] not in remaining_ids
+                    ]
                     save_table_data(table_name, updated_data)
                     set_select_cache(create_cacher())
-                    for row in selected_data:
+                    for record_id in deleted_ids:
                         print(
-                            f'Запись с ID={row["ID"]} удалена '
+                            f'Запись с ID={record_id} удалена '
                             f'из таблицы "{table_name}"'
                         )
                 case 'info':
