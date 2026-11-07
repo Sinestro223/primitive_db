@@ -25,7 +25,7 @@ from .utils import (
 
 
 def print_help() -> None:
-    """Печатает текст help"""
+    """Печать help текста"""
    
     print("\n***Процесс работы с таблицей***")
     print("Функции:")
@@ -44,7 +44,7 @@ def print_help() -> None:
 
 
 def run() -> None:
-    """Запускает цикл для работы с database"""
+    """Запуск цикла для работы с database"""
     print_help()
     set_select_cache(create_cacher())
     while True:

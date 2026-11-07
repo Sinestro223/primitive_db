@@ -8,7 +8,11 @@ cache_select = create_cacher()
 
 
 def set_select_cache(cache_result: Callable) -> None:
-    """Заменяет кеш выборки."""
+    """Обнуление кеша
+
+    Args:
+        cache_result (Callable): функция кеша
+    """
     global cache_select
     cache_select = cache_result
 
@@ -62,7 +66,7 @@ def drop_table(
         metadata: dict[str, dict[str, str]], 
         table_name: str
     ) -> dict[str, dict[str, str]]:
-    """Удаление таблицы по её имени
+    """Удаление таблицы по ее имени
 
     Args:
         metadata (dict[str, dict[str, str]]): метаданные таблицы
@@ -88,7 +92,8 @@ def select(
 
     Args:
         table_data (list[dict[str, Any]]): записи таблицы
-        where_clause (dict[str, Any] | None, optional): условие. Defaults to None.
+        where_clause (dict[str, Any] | None, optional): условие. 
+            Defaults to None.
 
     Returns:
         list[dict[str, Any]]: выбранные записи
