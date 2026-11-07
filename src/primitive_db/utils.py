@@ -1,7 +1,7 @@
 import json
 import os
 
-from .constants import DATA_DIR
+from .constants import DATA_DIR, DATATYPE_DICT
 
 
 def validate_table_name(table_name: str) -> None:
@@ -97,3 +97,21 @@ def save_table_data(table_name: str, data: list[dict]) -> None:
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(filepath, 'w') as f:
         json.dump(data, f)
+
+
+def validate_column_values(
+        table_columns: dict[str, str],
+        column_values: dict[str, str | int | bool],
+    ) -> None:
+    """Проверка названий столбцов и типов значений
+
+    Args:
+        table_columns (dict[str, str]): схема таблицы
+        column_values (dict[str, str | int | bool]): столбцы и значения из команды
+    """
+    for col_name, value in column_values.items():
+        if col_name not in table_columns:
+            raise ValueError(f'Столбец "{col_name}" не существует')
+        dtype = table_columns[col_name]
+        if type(value) is not DATATYPE_DICT.get(dtype):
+            raise ValueError(f'Столбец "{col_name}" должен иметь тип {dtype}')

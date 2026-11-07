@@ -1,7 +1,7 @@
 import prompt
 from prettytable import PrettyTable
 
-from .constants import DATATYPE_DICT, META_FILE
+from .constants import META_FILE
 from .core import (
     create_table,
     delete,
@@ -19,6 +19,7 @@ from .utils import (
     load_table_data,
     save_metadata,
     save_table_data,
+    validate_column_values,
 )
 
 
@@ -162,14 +163,7 @@ def run() -> None:
                         if splitted_command[3] != 'where':
                             raise ValueError('После имени таблицы ожидалось where')
                         where_clause = parse_where(' '.join(splitted_command[4:]))
-                        for col_name, value in where_clause.items():
-                            if col_name not in table_columns:
-                                raise ValueError(f'Столбец "{col_name}" не существует')
-                            dtype = table_columns[col_name]
-                            if type(value) is not DATATYPE_DICT.get(dtype):
-                                raise ValueError(
-                                    f'Столбец "{col_name}" должен иметь тип {dtype}'
-                                )
+                        validate_column_values(table_columns, where_clause)
 
                     table_data = load_table_data(table_name)
                     selected_data = select(table_data, where_clause)
@@ -193,15 +187,8 @@ def run() -> None:
                     where_clause = parse_where(
                         ' '.join(splitted_command[where_idx + 1:])
                     )
-                    for clause in (set_clause, where_clause):
-                        for col_name, value in clause.items():
-                            if col_name not in table_columns:
-                                raise ValueError(f'Столбец "{col_name}" не существует')
-                            dtype = table_columns[col_name]
-                            if type(value) is not DATATYPE_DICT.get(dtype):
-                                raise ValueError(
-                                    f'Столбец "{col_name}" должен иметь тип {dtype}'
-                                )
+                    validate_column_values(table_columns, set_clause)
+                    validate_column_values(table_columns, where_clause)
 
                     table_data = load_table_data(table_name)
                     updated_data = update(table_data, set_clause, where_clause)
@@ -234,14 +221,7 @@ def run() -> None:
                         raise ValueError(f'Таблица "{table_name}" не существует')
                     table_columns = db_meta[table_name]
                     where_clause = parse_where(' '.join(splitted_command[4:]))
-                    for col_name, value in where_clause.items():
-                        if col_name not in table_columns:
-                            raise ValueError(f'Столбец "{col_name}" не существует')
-                        dtype = table_columns[col_name]
-                        if type(value) is not DATATYPE_DICT.get(dtype):
-                            raise ValueError(
-                                f'Столбец "{col_name}" должен иметь тип {dtype}'
-                            )
+                    validate_column_values(table_columns, where_clause)
                     table_data = load_table_data(table_name)
                     updated_data = delete(table_data, where_clause)
                     if updated_data is None:
