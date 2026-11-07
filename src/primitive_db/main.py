@@ -6,3 +6,7 @@ def main() -> None:
     """Запуск цикла работы database"""
     print('DB project is running!')
     run()
+
+
+if __name__ == '__main__':
+    main()
